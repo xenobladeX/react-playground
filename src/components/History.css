@@ -1,0 +1,9 @@
+.history-item button.active {
+    outline: none;
+    background-color: aqua;
+}
+
+.history-item button:active {
+    outline: none;
+    background-color: aqua;
+}

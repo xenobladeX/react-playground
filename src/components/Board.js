@@ -25,7 +25,7 @@ class Board extends React.Component {
                     <div key={row} className="board-row">
                         {rowSquares}
                     </div>
-                )
+                );
             }
             return allSquares;
         }

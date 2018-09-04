@@ -1,6 +1,7 @@
 import './Game.css';
 import React from 'react';
 import Board from '../components/Board';
+import History from '../components/History';
 
 class Game extends React.Component {
     constructor(props) {
@@ -11,44 +12,118 @@ class Game extends React.Component {
             defaultSquares[i] = Array(defaultNumber).fill(null);
         }
         this.state = {
-            whiteTurn: true,
+            first: 'O',
             number: defaultNumber,
             squares: defaultSquares,
             steps: 0,
             winScore: 5,
-            hasWin: false,
+            winner: null,
+            currentStep: 0,
         }
     }
 
     render() {
+        var squares = this.currentSquares();
         return (
             <div className="game">
                 <div className="game-board">
                     <Board number={this.state.number}
-                        squares={this.state.squares}
+                        squares={squares}
                         squareClick={this.squareClick} />
                 </div>
                 <div className="game-info">
-                    <div>{/* status */}</div>
-                    <ol>{/* todo */}</ol>
+                    <div className="game-status">{this.gameStatus(squares)}</div>
+                    <button onClick={this.reset}>reset</button>
+                    <History steps={this.state.steps}
+                        currentStep={this.state.currentStep}
+                        jumpTo={this.jumpTo}
+                    />
                 </div>
             </div>
         );
     }
 
+    gameStatus = (squares) => {
+        if(this.state.winner != null) {
+            return `Winner: ${this.state.winner}`;
+        } else {
+            return `Next player: ${this.getNextTurn(this.getTurn(squares))}`
+        }
+    }
+
+    currentSquares = () => {
+        return this.state.squares.map((row) => {
+            var newRow = [...row];
+            for (var j=0; j<newRow.length; j++) {
+                var value = newRow[j];
+                if(value && value.steps>this.state.currentStep) {
+                    newRow[j] = null;
+                }
+            }
+            return newRow;
+        });
+    }
+
+    getTurn = (squares) => {
+        for (var i=0; i<squares.length; i++) {
+            var row = squares[i];
+            for (var j=0; j<row.length; j++) {
+                var value = row[j];
+                if(value && value.steps === this.state.steps) {
+                    return value.value;
+                }
+            }
+        }
+        return this.state.first;
+    }
+
+    getNextTurn = (turn) => {
+        return turn === 'X' ? 'O' : 'X';
+    }
+
+    reset = (e) => {
+        var number = prompt('输入行数', '19');
+        
+        if(number) {
+            number =  number >= this.state.winScore ? number : this.state.number;
+            var defaultSquares = new Array(number).fill(null);
+            for (var i = 0; i < number; i++) {
+                defaultSquares[i] = Array(number).fill(null);
+            }
+            this.setState({
+                number: number,
+                squares: defaultSquares,
+                steps: 0,
+                winScore: 5,
+                winner: null,
+            });
+        }
+    }
+
+    jumpTo = (index) => {
+        this.setState({
+            currentStep: index,
+        });
+    };
+
     squareClick = (row, column) => {
-        if (this.state.squares[row][column] == null && !this.state.hasWin) {
-            var squares = [...this.state.squares];
+        var squares = this.currentSquares();
+        var turn = this.getTurn(squares);
+        if (squares[row][column] == null) {
+            if (this.state.currentStep === this.state.steps && this.state.winner != null) {
+                return;
+            }
+            var steps = this.state.currentStep < this.state.steps ? this.state.currentStep + 1: this.state.steps + 1;
             squares[row][column] = {
-                steps: this.state.steps,
-                value: this.state.whiteTurn ? 'O' : 'X',
+                steps: steps,
+                value: turn,
             };
             var hasWin = this.calculateWinner(squares, row, column);
             this.setState({
                 squares: squares,
-                whiteTurn: !this.state.whiteTurn,
-                steps: this.state.steps + 1,
-                hasWin: hasWin,
+                steps: steps,
+                winner: hasWin ? (this.getTurn(turn)) : null,
+                currentStep: steps,
             });
         }
     }
@@ -65,7 +140,6 @@ class Game extends React.Component {
 
     calculateInDirection(squares, row, column, rowPlus, columnPlus) {
         var number = 1;
-        console.log('calculate');
         var value = squares[row][column].value;
         var foreDirection = true, preDireation = true;
         for (var i = 1; i < this.state.winScore; i++) {
