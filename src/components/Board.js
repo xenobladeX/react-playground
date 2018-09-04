@@ -8,35 +8,41 @@ class Board extends React.Component {
     }
 
     render() {
-        const status = 'Next player: X';
+        var borderSquares = (number) => {
+            var allSquares = [];
+            for (var row = 0; row < number; row++) {
+                var rowSquares = [];
+                for (var column = 0; column < number; column++) {
+                    rowSquares.push(
+                        <Square key={row + '_' + column}
+                            row={row} column={column} 
+                            value={this.props.squares[row][column]}
+                            onClick={this.squareClick}
+                            />
+                    );
+                }
+                allSquares.push(
+                    <div key={row} className="board-row">
+                        {rowSquares}
+                    </div>
+                )
+            }
+            return allSquares;
+        }
 
         return (
             <div>
-                <div className="status">{status}</div>
-                <div className="boader-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="boader-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="boader-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
-            </div>    
+                {borderSquares(this.props.number)}
+            </div>
         );
     }
 
-    renderSquare(i) {
-        return (
-            <Square value={i}/>
-        )
+    squareClick = (row, column) => {
+        if(this.props.squareClick) {
+            this.props.squareClick(row, column);
+        }
     }
+
 }
 
 export default Board;

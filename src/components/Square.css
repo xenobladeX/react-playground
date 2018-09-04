@@ -17,3 +17,7 @@
 .square:focus {
     outline: none;
 }
+
+.square.occupy {
+    background: #f4f5f5;
+}
