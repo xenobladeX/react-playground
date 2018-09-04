@@ -69,7 +69,7 @@ class Game extends React.Component {
             var row = squares[i];
             for (var j=0; j<row.length; j++) {
                 var value = row[j];
-                if(value && value.steps === this.state.steps) {
+                if(value && value.steps === this.state.currentStep) {
                     return value.value;
                 }
             }
@@ -78,7 +78,11 @@ class Game extends React.Component {
     }
 
     getNextTurn = (turn) => {
-        return turn === 'X' ? 'O' : 'X';
+        if(this.state.steps === 0){
+            return this.state.first;
+        } else {
+            return turn === 'X' ? 'O' : 'X';
+        }
     }
 
     reset = (e) => {
@@ -116,13 +120,13 @@ class Game extends React.Component {
             var steps = this.state.currentStep < this.state.steps ? this.state.currentStep + 1: this.state.steps + 1;
             squares[row][column] = {
                 steps: steps,
-                value: turn,
+                value: this.getNextTurn(turn),
             };
             var hasWin = this.calculateWinner(squares, row, column);
             this.setState({
                 squares: squares,
                 steps: steps,
-                winner: hasWin ? (this.getTurn(turn)) : null,
+                winner: hasWin ? turn : null,
                 currentStep: steps,
             });
         }
