@@ -7,10 +7,7 @@ class Game extends React.Component {
     constructor(props) {
         super(props);
         var defaultNumber = 19;
-        var defaultSquares = new Array(defaultNumber).fill(null);
-        for (var i = 0; i < defaultNumber; i++) {
-            defaultSquares[i] = Array(defaultNumber).fill(null);
-        }
+        var defaultSquares = this.initSquares(defaultNumber);
         this.state = {
             first: 'O',
             number: defaultNumber,
@@ -27,8 +24,7 @@ class Game extends React.Component {
         return (
             <div className="game">
                 <div className="game-board">
-                    <Board number={this.state.number}
-                        squares={squares}
+                    <Board squares={squares}
                         squareClick={this.squareClick} />
                 </div>
                 <div className="game-info">
@@ -49,6 +45,18 @@ class Game extends React.Component {
         } else {
             return `Next player: ${this.getNextTurn(this.getTurn(squares))}`
         }
+    }
+
+    initSquares(number) {
+        var squares = [];
+        for(var i=0; i<number; i++) {
+            var row =[];
+            for(var j=0; j<number; j++) {
+                row.push(null);
+            }
+            squares.push(row);
+        }
+        return squares;
     }
 
     calculateSquares(squares) {
@@ -90,10 +98,8 @@ class Game extends React.Component {
         
         if(number) {
             number =  number >= this.state.winScore ? number : this.state.number;
-            var defaultSquares = new Array(number).fill(null);
-            for (var i = 0; i < number; i++) {
-                defaultSquares[i] = Array(number).fill(null);
-            }
+            console.log('test');
+            var defaultSquares = this.initSquares(number);
             this.setState({
                 number: number,
                 squares: defaultSquares,

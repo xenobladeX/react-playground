@@ -5,37 +5,29 @@ import Square from './Square';
 class Board extends React.Component {
 
     render() {
-        var borderSquares = (number) => {
-            var allSquares = [];
-            for (var row = 0; row < number; row++) {
-                var rowSquares = [];
-                for (var column = 0; column < number; column++) {
-                    rowSquares.push(
-                        <Square key={row + '_' + column}
-                            row={row} column={column} 
-                            value={this.props.squares[row][column]}
-                            onClick={this.squareClick}
-                            />
-                    );
-                }
-                allSquares.push(
-                    <div key={row} className="board-row">
-                        {rowSquares}
-                    </div>
-                );
-            }
-            return allSquares;
-        }
-
         return (
             <div>
-                {borderSquares(this.props.number)}
+                {this.props.squares.map((row, rowIndex) => {
+                    return (
+                        <div key={rowIndex} className="board-row">
+                            {row.map((square, columnIndex) => {
+                                return (
+                                    <Square key={rowIndex + '_' + columnIndex}
+                                        row={rowIndex} column={columnIndex}
+                                        value={square}
+                                        onClick={this.squareClick}
+                                    />
+                                )
+                            })}
+                        </div>
+                    )
+                })}
             </div>
         );
     }
 
     squareClick = (row, column) => {
-        if(this.props.squareClick) {
+        if (this.props.squareClick) {
             this.props.squareClick(row, column);
         }
     }

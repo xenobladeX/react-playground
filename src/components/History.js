@@ -11,7 +11,7 @@ class History extends React.Component {
                     <li key={i} className="history-item">
                         <button
                             className={this.props.currentStep === i + 1 ? 'active' : ''}
-                            onClick={this.onClick(i + 1)}>{'Jump to step ' + (i + 1)}</button>
+                            onClick={this.onClick.bind(this, i)}>{'Jump to step ' + (i + 1)}</button>
                     </li>
                 );
             }
@@ -25,11 +25,9 @@ class History extends React.Component {
     }
 
     onClick = (index) => {
-        return () => {
-            if (this.props.jumpTo) {
-                this.props.jumpTo(index);
-            }
-        };
+        if (this.props.jumpTo) {
+            this.props.jumpTo(index+1);
+        }
     };
 
 }
