@@ -2,12 +2,6 @@ import './History.css';
 import React from 'react';
 
 class History extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        };
-    }
 
     render() {
         var historyItems = (number) => {
@@ -17,7 +11,7 @@ class History extends React.Component {
                     <li key={i} className="history-item">
                         <button
                             className={this.props.currentStep === i + 1 ? 'active' : ''}
-                            onClick={(e) => this.onClick(i + 1)}>{'Jump to step ' + (i + 1)}</button>
+                            onClick={this.onClick(i + 1)}>{'Jump to step ' + (i + 1)}</button>
                     </li>
                 );
             }
@@ -31,9 +25,11 @@ class History extends React.Component {
     }
 
     onClick = (index) => {
-        if (this.props.jumpTo) {
-            this.props.jumpTo(index);
-        }
+        return () => {
+            if (this.props.jumpTo) {
+                this.props.jumpTo(index);
+            }
+        };
     };
 
 }

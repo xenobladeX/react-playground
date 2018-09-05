@@ -23,7 +23,7 @@ class Game extends React.Component {
     }
 
     render() {
-        var squares = this.currentSquares();
+        var squares = this.calculateSquares(this.state.squares);
         return (
             <div className="game">
                 <div className="game-board">
@@ -43,7 +43,7 @@ class Game extends React.Component {
         );
     }
 
-    gameStatus = (squares) => {
+    gameStatus(squares) {
         if(this.state.winner != null) {
             return `Winner: ${this.state.winner}`;
         } else {
@@ -51,8 +51,8 @@ class Game extends React.Component {
         }
     }
 
-    currentSquares = () => {
-        return this.state.squares.map((row) => {
+    calculateSquares(squares) {
+        return squares.map((row) => {
             var newRow = [...row];
             for (var j=0; j<newRow.length; j++) {
                 var value = newRow[j];
@@ -64,7 +64,7 @@ class Game extends React.Component {
         });
     }
 
-    getTurn = (squares) => {
+    getTurn(squares) {
         for (var i=0; i<squares.length; i++) {
             var row = squares[i];
             for (var j=0; j<row.length; j++) {
@@ -77,7 +77,7 @@ class Game extends React.Component {
         return this.state.first;
     }
 
-    getNextTurn = (turn) => {
+    getNextTurn(turn) {
         if(this.state.steps === 0){
             return this.state.first;
         } else {
@@ -111,25 +111,29 @@ class Game extends React.Component {
     };
 
     squareClick = (row, column) => {
-        var squares = this.currentSquares();
-        var turn = this.getTurn(squares);
-        if (squares[row][column] == null) {
-            if (this.state.currentStep === this.state.steps && this.state.winner != null) {
-                return;
+        this.setState(preState => {
+            var squares = this.calculateSquares(preState.squares);
+            var turn = this.getTurn(squares);
+            if (squares[row][column] == null) {
+                if (preState.currentStep === preState.steps && preState.winner != null) {
+                    return preState;
+                }
+                var steps = preState.currentStep < preState.steps ? preState.currentStep + 1: preState.steps + 1;
+                squares[row][column] = {
+                    steps: steps,
+                    value: this.getNextTurn(turn),
+                };
+                var hasWin = this.calculateWinner(squares, row, column);
+                return {
+                    squares: squares,
+                    steps: steps,
+                    winner: hasWin ? turn : null,
+                    currentStep: steps,
+                };
+            } else {
+                return preState;
             }
-            var steps = this.state.currentStep < this.state.steps ? this.state.currentStep + 1: this.state.steps + 1;
-            squares[row][column] = {
-                steps: steps,
-                value: this.getNextTurn(turn),
-            };
-            var hasWin = this.calculateWinner(squares, row, column);
-            this.setState({
-                squares: squares,
-                steps: steps,
-                winner: hasWin ? turn : null,
-                currentStep: steps,
-            });
-        }
+        })
     }
 
     calculateWinner(squares, row, column) {
