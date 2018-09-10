@@ -119,7 +119,8 @@ class Game extends React.Component {
     squareClick = (row, column) => {
         this.setState(preState => {
             var squares = this.calculateSquares(preState.squares);
-            var turn = this.getTurn(squares);
+            var preTurn = this.getTurn(squares);
+            var turn = this.getNextTurn(preTurn);
             if (squares[row][column] == null) {
                 if (preState.currentStep === preState.steps && preState.winner != null) {
                     return preState;
@@ -127,7 +128,7 @@ class Game extends React.Component {
                 var steps = preState.currentStep < preState.steps ? preState.currentStep + 1: preState.steps + 1;
                 squares[row][column] = {
                     steps: steps,
-                    value: this.getNextTurn(turn),
+                    value: turn,
                 };
                 var hasWin = this.calculateWinner(squares, row, column);
                 return {
