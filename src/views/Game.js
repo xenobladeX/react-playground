@@ -1,10 +1,27 @@
+// @flow
+
 import './Game.css';
 import React from 'react';
 import Board from '../components/Board';
 import History from '../components/History';
 
-class Game extends React.Component {
-    constructor(props) {
+type Props = {
+
+};
+
+type State = {
+    first: ?string,
+    number: number,
+    squares: Array<Array<?Object>>,
+    steps: number,
+    winScore: number,
+    winner: ?string,
+    currentStep: number,
+};
+
+
+class Game extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         var defaultNumber = 19;
         var defaultSquares = this.initSquares(defaultNumber);
@@ -39,7 +56,7 @@ class Game extends React.Component {
         );
     }
 
-    gameStatus(squares) {
+    gameStatus(squares: Array<Array<?Object>>): string {
         if(this.state.winner != null) {
             return `Winner: ${this.state.winner}`;
         } else {
@@ -47,7 +64,7 @@ class Game extends React.Component {
         }
     }
 
-    initSquares(number) {
+    initSquares(number: number) {
         var squares = [];
         for(var i=0; i<number; i++) {
             var row =[];
@@ -59,7 +76,7 @@ class Game extends React.Component {
         return squares;
     }
 
-    calculateSquares(squares) {
+    calculateSquares(squares: Array<Array<?Object>>): Array<Array<?Object>>{
         return squares.map((row) => {
             var newRow = [...row];
             for (var j=0; j<newRow.length; j++) {
@@ -72,7 +89,7 @@ class Game extends React.Component {
         });
     }
 
-    getTurn(squares) {
+    getTurn(squares: Array<Array<?Object>>): ?string{
         for (var i=0; i<squares.length; i++) {
             var row = squares[i];
             for (var j=0; j<row.length; j++) {
@@ -85,16 +102,16 @@ class Game extends React.Component {
         return this.state.first;
     }
 
-    getNextTurn(turn) {
+    getNextTurn(turn: ?string): string{
         if(this.state.steps === 0){
-            return this.state.first;
+            return this.state.first ? this.state.first : '';
         } else {
             return turn === 'X' ? 'O' : 'X';
         }
     }
 
-    reset = (e) => {
-        var number = prompt('输入行数', '19');
+    reset = (e: Object) => {
+        var number: number = parseInt(prompt('输入行数', '19'));
         
         if(number) {
             number =  number >= this.state.winScore ? number : this.state.number;
@@ -110,22 +127,22 @@ class Game extends React.Component {
         }
     }
 
-    jumpTo = (index) => {
+    jumpTo = (index: number) => {
         this.setState({
             currentStep: index,
         });
     };
 
-    squareClick = (row, column) => {
+    squareClick = (row: number, column: number) => {
         this.setState(preState => {
             var squares = this.calculateSquares(preState.squares);
-            var preTurn = this.getTurn(squares);
+            var preTurn: ?string = this.getTurn(squares);
             var turn = this.getNextTurn(preTurn);
             if (squares[row][column] == null) {
                 if (preState.currentStep === preState.steps && preState.winner != null) {
                     return preState;
                 }
-                var steps = preState.currentStep < preState.steps ? preState.currentStep + 1: preState.steps + 1;
+                var steps: number = preState.currentStep < preState.steps ? preState.currentStep + 1: preState.steps + 1;
                 squares[row][column] = {
                     steps: steps,
                     value: turn,
@@ -143,7 +160,8 @@ class Game extends React.Component {
         })
     }
 
-    calculateWinner(squares, row, column) {
+    calculateWinner(squares: Array<Array<?Object>>, 
+        row: number, column: number): boolean {
 
         if (this.calculateInDirection(squares, row, column, 0, 1) ||
             this.calculateInDirection(squares, row, column, 1, 1) ||
@@ -151,10 +169,15 @@ class Game extends React.Component {
             this.calculateInDirection(squares, row, column, -1, 1)) {
             return true;
         }
+        return false;
     }
 
-    calculateInDirection(squares, row, column, rowPlus, columnPlus) {
+    calculateInDirection(squares: Array<Array<?Object>>, 
+        row: number, column: number, rowPlus: number, columnPlus: number) {
         var number = 1;
+        if(!squares[row][column]) {
+            throw new Error(`square is empty in row ${row} column ${column}`);
+        }
         var value = squares[row][column].value;
         var foreDirection = true, preDireation = true;
         for (var i = 1; i < this.state.winScore; i++) {
